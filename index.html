@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>SAFELINK PROFIT ENGINE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">SP</div>
+    <div>
+      <p class="eyebrow">LINK MANAGEMENT WORKSPACE</p>
+      <h1>SAFELINK <span>PROFIT ENGINE</span></h1>
+    </div>
+    <span class="local-tag">MODE LOKAL</span>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">DASHBOARD</p>
+        <h2>Kelola tautan promosi<br>lebih praktis.</h2>
+        <p class="muted">Simpan, kelompokkan, cari, dan siapkan tautan kampanye dari satu tempat.</p>
+      </div>
+      <div class="intro-icon" aria-hidden="true">↗</div>
+    </section>
+
+    <section class="stats" aria-label="Ringkasan">
+      <article class="stat-card"><span>Total tautan</span><strong id="totalLinks">0</strong></article>
+      <article class="stat-card"><span>Kategori</span><strong id="totalCategories">0</strong></article>
+      <article class="stat-card"><span>Ditampilkan</span><strong id="shownLinks">0</strong></article>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">KOLEKSI</p><h3>Tambah tautan</h3></div>
+      </div>
+      <form id="linkForm" class="form-grid">
+        <input type="hidden" id="editId">
+        <label>Nama tautan<input id="linkName" type="text" placeholder="Contoh: Produk unggulan" required maxlength="80"></label>
+        <label>URL tujuan<input id="linkUrl" type="url" placeholder="https://contoh.com" required></label>
+        <label>Kategori
+          <input id="linkCategory" type="text" placeholder="Contoh: Affiliate, Toko, Sosial" maxlength="40">
+        </label>
+        <label>Catatan (opsional)<input id="linkNotes" type="text" placeholder="Catatan singkat" maxlength="160"></label>
+        <div class="form-actions">
+          <button class="btn primary" type="submit" id="saveButton">Simpan tautan</button>
+          <button class="btn secondary hidden" type="button" id="cancelEdit">Batal edit</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading list-heading">
+        <div><p class="eyebrow">DAFTAR TAUTAN</p><h3>Tautan tersimpan</h3></div>
+        <button class="btn outline" id="exportCsv" type="button">Ekspor CSV</button>
+      </div>
+      <div class="filters">
+        <input id="searchInput" type="search" placeholder="Cari nama, URL, atau catatan…">
+        <select id="categoryFilter" aria-label="Filter kategori"><option value="">Semua kategori</option></select>
+      </div>
+      <div id="linksList" class="links-list"></div>
+      <p id="emptyState" class="empty-state">Belum ada tautan. Tambahkan tautan pertama melalui formulir di atas.</p>
+    </section>
+
+    <section class="panel campaign-panel">
+      <div class="section-heading"><div><p class="eyebrow">KAMPANYE</p><h3>Pembuat URL UTM</h3></div></div>
+      <p class="muted small">Tambahkan parameter kampanye pada URL tujuan. Parameter UTM membantu alat analitik mengenali sumber kunjungan jika dipasang pada situs yang mendukung analitik.</p>
+      <div class="form-grid">
+        <label>URL dasar<input id="utmBase" type="url" placeholder="https://contoh.com/produk"></label>
+        <label>Source<input id="utmSource" placeholder="facebook"></label>
+        <label>Medium<input id="utmMedium" placeholder="social"></label>
+        <label>Campaign<input id="utmCampaign" placeholder="promo-november"></label>
+        <div class="form-actions">
+          <button class="btn primary" id="buildUtm" type="button">Buat URL</button>
+          <button class="btn secondary" id="copyUtm" type="button" disabled>Salin URL</button>
+        </div>
+      </div>
+      <output id="utmOutput" class="utm-output">URL kampanye akan tampil di sini.</output>
+    </section>
+
+    <footer>
+      <p>SAFELINK PROFIT ENGINE · Versi awal</p>
+      <p>Data tersimpan di browser/perangkat ini. Buat cadangan dengan Ekspor CSV.</p>
+    </footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
