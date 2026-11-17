@@ -1,149 +1,24 @@
-(() => {
-  "use strict";
-  const STORAGE_KEY = "safelinkProfitEngine.links.v1";
-  const $ = (id) => document.getElementById(id);
-  const form = $("linkForm");
-  let links = loadLinks();
-  let latestUtm = "";
-
-  function loadLinks() {
-    try {
-      const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-      return Array.isArray(value) ? value : [];
-    } catch { return []; }
-  }
-  function saveLinks() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(links)); }
-    catch { notify("Penyimpanan browser penuh atau tidak tersedia."); }
-  }
-  function notify(message) {
-    const toast = $("toast");
-    toast.textContent = message;
-    toast.classList.add("show");
-    window.clearTimeout(notify.timer);
-    notify.timer = window.setTimeout(() => toast.classList.remove("show"), 2400);
-  }
-  function safeUrl(raw) {
-    try {
-      const url = new URL(raw);
-      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
-    } catch { return ""; }
-  }
-  function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    })[char]);
-  }
-  function resetForm() {
-    form.reset();
-    $("editId").value = "";
-    $("saveButton").textContent = "Simpan tautan";
-    $("cancelEdit").classList.add("hidden");
-  }
-  function render() {
-    const query = $("searchInput").value.trim().toLowerCase();
-    const category = $("categoryFilter").value;
-    const categories = [...new Set(links.map(item => item.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-    const current = $("categoryFilter").value;
-    $("categoryFilter").innerHTML = '<option value="">Semua kategori</option>' +
-      categories.map(item => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("");
-    if (categories.includes(current)) $("categoryFilter").value = current;
-    const filtered = links.filter(item => {
-      const text = [item.name,item.url,item.category,item.notes].join(" ").toLowerCase();
-      return text.includes(query) && (!category || item.category === category);
-    });
-    $("totalLinks").textContent = links.length;
-    $("totalCategories").textContent = categories.length;
-    $("shownLinks").textContent = filtered.length;
-    $("linksList").innerHTML = filtered.map(item => `
-      <article class="link-card">
-        <div class="link-symbol">↗</div>
-        <div class="link-info">
-          <strong>${escapeHtml(item.name)}</strong>
-          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.url)}</a>
-          <div class="link-meta">${escapeHtml(item.category || "Tanpa kategori")}${item.notes ? " · " + escapeHtml(item.notes) : ""}</div>
-        </div>
-        <div class="link-actions">
-          <button class="mini-btn" data-action="copy" data-id="${item.id}">Salin</button>
-          <button class="mini-btn" data-action="edit" data-id="${item.id}">Edit</button>
-          <button class="mini-btn delete" data-action="delete" data-id="${item.id}">Hapus</button>
-        </div>
-      </article>`).join("");
-    $("emptyState").classList.toggle("hidden", filtered.length > 0);
-  }
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    const name = $("linkName").value.trim();
-    const url = safeUrl($("linkUrl").value.trim());
-    if (!name || !url) return notify("Isi nama dan URL http/https yang valid.");
-    const id = $("editId").value;
-    const record = {
-      id: id || (Date.now().toString(36) + Math.random().toString(36).slice(2,7)),
-      name, url, category: $("linkCategory").value.trim(),
-      notes: $("linkNotes").value.trim()
-    };
-    if (id) {
-      links = links.map(item => item.id === id ? record : item);
-      notify("Tautan berhasil diperbarui.");
-    } else {
-      links.unshift(record);
-      notify("Tautan berhasil disimpan.");
-    }
-    saveLinks(); resetForm(); render();
-  });
-  $("cancelEdit").addEventListener("click", resetForm);
-  $("searchInput").addEventListener("input", render);
-  $("categoryFilter").addEventListener("change", render);
-  $("linksList").addEventListener("click", async event => {
-    const button = event.target.closest("button[data-action]");
-    if (!button) return;
-    const item = links.find(link => link.id === button.dataset.id);
-    if (!item) return;
-    if (button.dataset.action === "copy") {
-      try { await navigator.clipboard.writeText(item.url); notify("URL disalin."); }
-      catch { notify("Tidak dapat menyalin otomatis. Buka tautan lalu salin URL."); }
-    }
-    if (button.dataset.action === "edit") {
-      $("editId").value = item.id;
-      $("linkName").value = item.name;
-      $("linkUrl").value = item.url;
-      $("linkCategory").value = item.category;
-      $("linkNotes").value = item.notes;
-      $("saveButton").textContent = "Simpan perubahan";
-      $("cancelEdit").classList.remove("hidden");
-      $("linkName").focus();
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-    if (button.dataset.action === "delete" && window.confirm(`Hapus tautan "${item.name}"?`)) {
-      links = links.filter(link => link.id !== item.id);
-      saveLinks(); render(); notify("Tautan dihapus.");
-    }
-  });
-  $("exportCsv").addEventListener("click", () => {
-    if (!links.length) return notify("Belum ada data untuk diekspor.");
-    const rows = [["Nama","URL","Kategori","Catatan"], ...links.map(x => [x.name,x.url,x.category,x.notes])];
-    const csv = "\uFEFF" + rows.map(row => row.map(value => `"${String(value).replace(/"/g,'""')}"`).join(",")).join("\r\n");
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "safelink-profit-engine.csv"; a.click();
-    URL.revokeObjectURL(url); notify("File CSV disiapkan.");
-  });
-  $("buildUtm").addEventListener("click", () => {
-    const base = safeUrl($("utmBase").value.trim());
-    if (!base) return notify("Masukkan URL dasar yang valid.");
-    const url = new URL(base);
-    [["utm_source","utmSource"],["utm_medium","utmMedium"],["utm_campaign","utmCampaign"]].forEach(([key,id]) => {
-      const value = $(id).value.trim();
-      if (value) url.searchParams.set(key,value);
-    });
-    latestUtm = url.href;
-    $("utmOutput").textContent = latestUtm;
-    $("copyUtm").disabled = false;
-  });
-  $("copyUtm").addEventListener("click", async () => {
-    if (!latestUtm) return;
-    try { await navigator.clipboard.writeText(latestUtm); notify("URL kampanye disalin."); }
-    catch { notify("Salin URL yang tampil secara manual."); }
-  });
-  render();
-})();
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KEY='safelink_shrinkme_edition_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"links":[],"campaigns":[],"reports":[]}');
+const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function switchTab(t){$$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('active',p.id===t))}
+$$('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function csv(name,rows){const data=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+data],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+$('#linkForm').onsubmit=e=>{e.preventDefault();db.links.unshift({id:id(),name:$('#name').value.trim(),category:$('#category').value.trim(),original:$('#original').value.trim(),short:$('#short').value.trim(),campaign:$('#campaignName').value.trim(),notes:$('#notes').value.trim(),created:new Date().toISOString()});e.target.reset();save();alert('Link ShrinkMe berhasil disimpan.')};
+function updateSelects(){const opts=db.links.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join('');$('#cLink').innerHTML='<option value="">Pilih link (opsional)</option>'+opts;$('#rLink').innerHTML='<option value="">Tidak dipilih</option>'+opts;const cats=[...new Set(db.links.map(l=>l.category).filter(Boolean))];let old=$('#filterCategory').value;$('#filterCategory').innerHTML='<option value="">Semua kategori</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');$('#filterCategory').value=cats.includes(old)?old:''}
+function renderLinks(){let q=$('#searchLinks').value.toLowerCase(),cat=$('#filterCategory').value;let arr=db.links.filter(l=>(!cat||l.category===cat)&&[l.name,l.category,l.campaign,l.original,l.short].join(' ').toLowerCase().includes(q));$('#linkList').className=arr.length?'list':'list empty';$('#linkList').innerHTML=arr.length?arr.map(l=>`<article class="item"><div class="itemtop"><h3>${esc(l.name)}</h3><span class="tag">SHRINKME</span></div><div class="muted">Kategori: ${esc(l.category||'Belum diisi')} · Kampanye: ${esc(l.campaign||'Belum ditentukan')}</div><div class="muted">Link pendek: ${esc(l.short)}</div><div class="muted">Link asli: ${esc(l.original)}</div>${l.notes?`<div class="muted">Catatan: ${esc(l.notes)}</div>`:''}<div class="itemactions"><button data-copy="${l.id}">Salin link pendek</button><button data-open="${l.id}">Buka link</button><button data-edit="${l.id}">Edit</button><button class="danger" data-delete="${l.id}">Hapus</button></div></article>`).join(''):'Belum ada link yang cocok.'}
+$('#searchLinks').oninput=renderLinks;$('#filterCategory').onchange=renderLinks;
+$('#linkList').onclick=e=>{let d=e.target.dataset,l=db.links.find(x=>x.id===(d.copy||d.open||d.edit||d.delete));if(!l)return;if(d.copy)navigator.clipboard?.writeText(l.short).then(()=>alert('Link pendek disalin.'));if(d.open)window.open(l.short,'_blank','noopener');if(d.delete&&confirm('Hapus link ini?')){db.links=db.links.filter(x=>x.id!==l.id);save()}if(d.edit){let n=prompt('Ubah nama link:',l.name);if(n===null)return;let s=prompt('Ubah link pendek:',l.short);if(s===null)return;let o=prompt('Ubah link asli:',l.original);if(o===null)return;let c=prompt('Kategori:',l.category);if(c===null)return;l.name=n.trim();l.short=s.trim();l.original=o.trim();l.category=c.trim();save()}};
+$('#campaignForm').onsubmit=e=>{e.preventDefault();db.campaigns.unshift({id:id(),name:$('#cName').value.trim(),date:$('#cDate').value,platform:$('#cPlatform').value,linkId:$('#cLink').value,notes:$('#cNotes').value,done:false});e.target.reset();save();alert('Kampanye disimpan. Jadwal ini adalah pengingat rencana, bukan auto-posting.')};
+function renderCampaigns(){let el=$('#campaignList');el.className=db.campaigns.length?'list':'list empty';el.innerHTML=db.campaigns.length?db.campaigns.map(c=>{let l=db.links.find(x=>x.id===c.linkId);return `<article class="item"><div class="itemtop"><h3>${esc(c.name)}</h3><span class="tag">${c.done?'SELESAI':'TERENCANA'}</span></div><div class="muted">${esc(c.date||'Tanggal belum ditentukan')} · ${esc(c.platform)} · ${esc(l?.name||'Belum terkait link')}</div>${c.notes?`<div class="muted">${esc(c.notes)}</div>`:''}<label class="check"><input type="checkbox" data-done="${c.id}" ${c.done?'checked':''}> Tandai selesai</label><div class="itemactions"><button class="danger" data-cdelete="${c.id}">Hapus kampanye</button></div></article>`}).join(''):'Belum ada kampanye terencana.'}
+$('#campaignList').onchange=e=>{let k=e.target.dataset.done;if(k){let c=db.campaigns.find(x=>x.id===k);c.done=e.target.checked;save()}};$('#campaignList').onclick=e=>{let k=e.target.dataset.cdelete;if(k&&confirm('Hapus kampanye?')){db.campaigns=db.campaigns.filter(c=>c.id!==k);save()}};
+$('#reportForm').onsubmit=e=>{e.preventDefault();db.reports.unshift({id:id(),date:$('#rDate').value,linkId:$('#rLink').value,views:Number($('#rViews').value||0),earn:Number($('#rEarn').value||0),notes:$('#rNotes').value.trim()});e.target.reset();save();alert('Catatan hasil disimpan.')};
+function renderReports(){let el=$('#reportList');el.className=db.reports.length?'list':'list empty';el.innerHTML=db.reports.length?db.reports.map(r=>{let l=db.links.find(x=>x.id===r.linkId);return `<article class="item"><div class="itemtop"><h3>${esc(r.date)}</h3><span class="tag">CATATAN MANUAL</span></div><div>Paid views: <b>${r.views.toLocaleString('id-ID')}</b> · Penghasilan: <b>$${r.earn.toFixed(2)}</b></div><div class="muted">Link: ${esc(l?.name||'Tidak dipilih')} ${r.notes?'· '+esc(r.notes):''}</div><div class="itemactions"><button class="danger" data-rdelete="${r.id}">Hapus catatan</button></div></article>`}).join(''):'Belum ada catatan hasil.'}
+$('#reportList').onclick=e=>{let k=e.target.dataset.rdelete;if(k&&confirm('Hapus catatan ini?')){db.reports=db.reports.filter(r=>r.id!==k);save()}};
+$('#exportLinks').onclick=()=>csv('safelink-shrinkme-links.csv',[['Nama','Kategori','Link Asli','Link Pendek','Kampanye','Catatan'],...db.links.map(l=>[l.name,l.category,l.original,l.short,l.campaign,l.notes])]);
+$('#exportReports').onclick=()=>csv('safelink-shrinkme-reports.csv',[['Tanggal','Link ID','Paid Views','Penghasilan USD','Catatan'],...db.reports.map(r=>[r.date,r.linkId,r.views,r.earn,r.notes])]);
+function render(){updateSelects();renderLinks();renderCampaigns();renderReports();$('#totalLinks').textContent=db.links.length;$('#activeCampaigns').textContent=db.campaigns.filter(c=>!c.done).length;$('#totalViews').textContent=db.reports.reduce((a,r)=>a+r.views,0).toLocaleString('id-ID');$('#totalEarn').textContent='$'+db.reports.reduce((a,r)=>a+r.earn,0).toFixed(2)}
+render();
