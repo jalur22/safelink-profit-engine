@@ -1,92 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <title>SAFELINK PROFIT ENGINE</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d1728"><title>SAFELINK PROFIT ENGINE – ShrinkMe Edition</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand-mark">SP</div>
-    <div>
-      <p class="eyebrow">LINK MANAGEMENT WORKSPACE</p>
-      <h1>SAFELINK <span>PROFIT ENGINE</span></h1>
-    </div>
-    <span class="local-tag">MODE LOKAL</span>
-  </header>
-
-  <main class="container">
-    <section class="intro">
-      <div>
-        <p class="eyebrow">DASHBOARD</p>
-        <h2>Kelola tautan promosi<br>lebih praktis.</h2>
-        <p class="muted">Simpan, kelompokkan, cari, dan siapkan tautan kampanye dari satu tempat.</p>
-      </div>
-      <div class="intro-icon" aria-hidden="true">↗</div>
-    </section>
-
-    <section class="stats" aria-label="Ringkasan">
-      <article class="stat-card"><span>Total tautan</span><strong id="totalLinks">0</strong></article>
-      <article class="stat-card"><span>Kategori</span><strong id="totalCategories">0</strong></article>
-      <article class="stat-card"><span>Ditampilkan</span><strong id="shownLinks">0</strong></article>
-    </section>
-
-    <section class="panel">
-      <div class="section-heading">
-        <div><p class="eyebrow">KOLEKSI</p><h3>Tambah tautan</h3></div>
-      </div>
-      <form id="linkForm" class="form-grid">
-        <input type="hidden" id="editId">
-        <label>Nama tautan<input id="linkName" type="text" placeholder="Contoh: Produk unggulan" required maxlength="80"></label>
-        <label>URL tujuan<input id="linkUrl" type="url" placeholder="https://contoh.com" required></label>
-        <label>Kategori
-          <input id="linkCategory" type="text" placeholder="Contoh: Affiliate, Toko, Sosial" maxlength="40">
-        </label>
-        <label>Catatan (opsional)<input id="linkNotes" type="text" placeholder="Catatan singkat" maxlength="160"></label>
-        <div class="form-actions">
-          <button class="btn primary" type="submit" id="saveButton">Simpan tautan</button>
-          <button class="btn secondary hidden" type="button" id="cancelEdit">Batal edit</button>
-        </div>
-      </form>
-    </section>
-
-    <section class="panel">
-      <div class="section-heading list-heading">
-        <div><p class="eyebrow">DAFTAR TAUTAN</p><h3>Tautan tersimpan</h3></div>
-        <button class="btn outline" id="exportCsv" type="button">Ekspor CSV</button>
-      </div>
-      <div class="filters">
-        <input id="searchInput" type="search" placeholder="Cari nama, URL, atau catatan…">
-        <select id="categoryFilter" aria-label="Filter kategori"><option value="">Semua kategori</option></select>
-      </div>
-      <div id="linksList" class="links-list"></div>
-      <p id="emptyState" class="empty-state">Belum ada tautan. Tambahkan tautan pertama melalui formulir di atas.</p>
-    </section>
-
-    <section class="panel campaign-panel">
-      <div class="section-heading"><div><p class="eyebrow">KAMPANYE</p><h3>Pembuat URL UTM</h3></div></div>
-      <p class="muted small">Tambahkan parameter kampanye pada URL tujuan. Parameter UTM membantu alat analitik mengenali sumber kunjungan jika dipasang pada situs yang mendukung analitik.</p>
-      <div class="form-grid">
-        <label>URL dasar<input id="utmBase" type="url" placeholder="https://contoh.com/produk"></label>
-        <label>Source<input id="utmSource" placeholder="facebook"></label>
-        <label>Medium<input id="utmMedium" placeholder="social"></label>
-        <label>Campaign<input id="utmCampaign" placeholder="promo-november"></label>
-        <div class="form-actions">
-          <button class="btn primary" id="buildUtm" type="button">Buat URL</button>
-          <button class="btn secondary" id="copyUtm" type="button" disabled>Salin URL</button>
-        </div>
-      </div>
-      <output id="utmOutput" class="utm-output">URL kampanye akan tampil di sini.</output>
-    </section>
-
-    <footer>
-      <p>SAFELINK PROFIT ENGINE · Versi awal</p>
-      <p>Data tersimpan di browser/perangkat ini. Buat cadangan dengan Ekspor CSV.</p>
-    </footer>
-  </main>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
-</body>
-</html>
+<header class="top">
+ <div class="brand"><div class="logo">SP</div><div><div class="eyebrow">SHRINKME LINK WORKSPACE</div><b>SAFELINK <span>PROFIT ENGINE</span></b></div></div>
+ <span class="local">MODE LOKAL</span>
+</header>
+<main>
+ <section class="hero">
+  <div><div class="eyebrow">DASHBOARD SHRINKME</div><h1>Kelola link pendek<br>dan kampanye promosi.</h1><p>Simpan link, atur kampanye, dan catat hasil kunjungan dari satu tempat.</p></div>
+  <div class="heroicon">↗</div>
+ </section>
+ <section class="notice"><b>Informasi:</b> Aplikasi ini mengelola tautan dan kampanye promosi. Statistik paid views dan saldo diinput dari dashboard ShrinkMe. Tidak ada auto-click, bot, VPN manipulatif, atau pengunjung buatan.</section>
+ <section class="metrics">
+  <article><small>Total link</small><strong id="totalLinks">0</strong></article>
+  <article><small>Kampanye aktif</small><strong id="activeCampaigns">0</strong></article>
+  <article><small>Total paid views tercatat</small><strong id="totalViews">0</strong></article>
+  <article><small>Total penghasilan tercatat</small><strong id="totalEarn">$0.00</strong></article>
+ </section>
+ <nav class="tabs">
+  <button class="tab active" data-tab="links">Link ShrinkMe</button>
+  <button class="tab" data-tab="campaigns">Kampanye</button>
+  <button class="tab" data-tab="reports">Catatan hasil</button>
+ </nav>
+ <section class="panel active" id="links">
+  <div class="heading"><div><h2>Tambah link ShrinkMe</h2><p>Masukkan link asli dan link pendek yang dibuat melalui akun ShrinkMe kamu.</p></div></div>
+  <form id="linkForm" class="formgrid">
+   <label>Nama / judul konten<input id="name" required placeholder="Contoh: Video miniatur motor Yamaha"></label>
+   <label>Kategori<input id="category" placeholder="Contoh: Otomotif, sejarah, hiburan"></label>
+   <label class="wide">Link asli / tujuan<input id="original" type="url" required placeholder="https://youtube.com/..."></label>
+   <label class="wide">Link pendek ShrinkMe<input id="short" type="url" required placeholder="https://shrinkme.io/..."></label>
+   <label>Kampanye<input id="campaignName" placeholder="Contoh: Promosi video pekan ini"></label>
+   <label>Catatan<input id="notes" placeholder="Catatan tambahan (opsional)"></label>
+   <div class="wide actions"><button class="primary" type="submit">＋ Simpan link</button><button class="secondary" type="reset">Kosongkan</button></div>
+  </form>
+  <div class="heading listheading"><div><h2>Daftar link tersimpan</h2><p>Cari, salin, buka, edit, atau hapus tautan.</p></div><button class="secondary" id="exportLinks">Ekspor CSV</button></div>
+  <div class="toolbar"><input id="searchLinks" placeholder="Cari nama, kategori, atau kampanye…"><select id="filterCategory"><option value="">Semua kategori</option></select></div>
+  <div id="linkList" class="list empty">Belum ada link. Tambahkan link ShrinkMe pertama melalui formulir di atas.</div>
+ </section>
+ <section class="panel" id="campaigns">
+  <div class="heading"><div><h2>Perencana kampanye</h2><p>Atur jadwal dan catat tempat kamu membagikan konten.</p></div></div>
+  <form id="campaignForm" class="formgrid">
+   <label>Nama kampanye<input id="cName" required placeholder="Contoh: Video miniatur motor"></label>
+   <label>Tanggal rencana<input id="cDate" type="date"></label>
+   <label>Platform distribusi<select id="cPlatform"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>WhatsApp Status</option><option>Website / Blog</option><option>Lainnya</option></select></label>
+   <label>Link terkait<select id="cLink"><option value="">Pilih link (opsional)</option></select></label>
+   <label class="wide">Catatan / rencana promosi<textarea id="cNotes" rows="2" placeholder="Contoh: Buat caption informatif, lalu bagikan ke audiens yang relevan."></textarea></label>
+   <div class="wide actions"><button class="primary">＋ Simpan kampanye</button></div>
+  </form>
+  <div id="campaignList" class="list empty">Belum ada kampanye terencana.</div>
+ </section>
+ <section class="panel" id="reports">
+  <div class="heading"><div><h2>Catatan hasil ShrinkMe</h2><p>Salin angka dari dashboard ShrinkMe secara berkala. Angka di sini bukan data live.</p></div></div>
+  <form id="reportForm" class="formgrid">
+   <label>Tanggal<input id="rDate" type="date" required></label>
+   <label>Link terkait<select id="rLink"><option value="">Tidak dipilih</option></select></label>
+   <label>Paid views<input id="rViews" type="number" min="0" step="1" placeholder="0"></label>
+   <label>Penghasilan (USD)<input id="rEarn" type="number" min="0" step="0.01" placeholder="0.00"></label>
+   <label class="wide">Catatan<input id="rNotes" placeholder="Contoh: data dari dashboard hari ini"></label>
+   <div class="wide actions"><button class="primary">＋ Simpan catatan hasil</button></div>
+  </form>
+  <div class="heading listheading"><div><h2>Riwayat catatan</h2></div><button class="secondary" id="exportReports">Ekspor CSV</button></div>
+  <div id="reportList" class="list empty">Belum ada catatan hasil.</div>
+ </section>
+</main>
+<footer>SAFELINK PROFIT ENGINE · SHRINKME EDITION · Data tersimpan di browser/perangkat ini. Ekspor CSV untuk cadangan.</footer>
+<script src="app.js"></script>
+</body></html>
