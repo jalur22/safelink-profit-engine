@@ -1,45 +1,28 @@
-SAFELINK PROFIT ENGINE
-======================
+SAFELINK PROFIT ENGINE – SHRINKME EDITION
 
-Paket ini berisi aplikasi web statis sederhana untuk mengelola tautan promosi.
+Fokus:
+- Menyimpan link asli dan link pendek ShrinkMe.
+- Mengelompokkan tautan berdasarkan kategori dan kampanye.
+- Mencari, menyalin, membuka, mengedit, dan menghapus link.
+- Merencanakan kampanye distribusi manual.
+- Mencatat paid views dan penghasilan dari dashboard ShrinkMe secara manual.
+- Ekspor CSV untuk daftar link dan catatan hasil.
 
-FILE
-----
-- index.html : struktur halaman aplikasi
-- style.css  : tampilan dan tata letak
-- app.js     : fungsi tambah/edit/hapus/cari/ekspor dan pembuat URL UTM
-- README.txt : petunjuk ini
+Batasan yang perlu diketahui:
+- Aplikasi ini berjalan sebagai website statis dan menyimpan data di localStorage browser.
+- Jadwal kampanye adalah perencana/pengingat manual, bukan auto-posting.
+- Angka paid views dan saldo tidak dibaca otomatis dari ShrinkMe.
+- Tidak ada auto-click, bot, auto-traffic palsu, VPN manipulatif, random-user generator, atau simulasi pengunjung.
+- Pengunjung harus datang secara nyata dan sukarela. Tidak ada jaminan penghasilan.
+- Data tidak otomatis tersinkron antarperangkat. Ekspor CSV untuk cadangan.
 
-CARA MEMASANG DI GITHUB
------------------------
-1. Buat repositori GitHub bernama: safelink-profit-engine
-2. Pilih Add file > Upload files.
-3. Ekstrak ZIP ini di perangkat Anda.
-4. Unggah KEEMPAT FILE di atas ke direktori utama (root) repositori.
-   Jangan unggah file ZIP sebagai satu file.
-5. Tekan Commit changes.
-6. Buka Settings > Pages.
-7. Pada Build and deployment, pilih Deploy from a branch.
-8. Pilih Branch: main dan Folder: /(root), lalu Save.
-9. Tunggu proses penerbitan selesai. Alamat situs biasanya:
-   https://jalur22.github.io/safelink-profit-engine/
+Pemasangan:
+1. Buka repository GitHub: jalur22/safelink-profit-engine
+2. Ganti file index.html, style.css, app.js, dan README.txt dengan file dari paket ini.
+3. Commit changes.
+4. GitHub Pages yang sudah aktif tidak perlu diatur ulang.
+5. Buka https://jalur22.github.io/safelink-profit-engine/ lalu refresh.
 
-FITUR
------
-- Menambah, mengubah, dan menghapus tautan
-- Kategori, pencarian, dan filter
-- Menyalin atau membuka URL
-- Ekspor daftar tautan ke CSV
-- Membuat URL dengan parameter UTM
-
-CATATAN PENTING
----------------
-- Data disimpan di localStorage browser/perangkat yang digunakan.
-- Data tidak otomatis tersinkron ke perangkat lain atau pengguna lain.
-- Hapus data browser dapat menghapus data aplikasi. Ekspor CSV secara berkala.
-- Versi ini tidak menyediakan akun/login, database online, sistem redirect,
-  pelacakan klik, atau laporan pendapatan.
-- Parameter UTM hanya menambahkan label kampanye pada URL. Pengukuran
-  kunjungan memerlukan layanan analitik pada situs tujuan.
-- Jangan menyimpan kata sandi, data pribadi sensitif, atau informasi rahasia
-  di aplikasi ini.
+Catatan:
+Versi ini memakai penyimpanan browser baru dengan kunci safelink_shrinkme_edition_v1.
+Simpan/ekspor data lama sebelum mengganti versi jika masih ada data yang diperlukan.
